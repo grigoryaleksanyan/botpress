@@ -185,18 +185,22 @@ async function sendDocument(event: sdk.IO.Event, client: Telegraf<ContextMessage
     fetch(new URL(event.payload.url))
       .then(response => response.buffer())
       .then(async buffer => {
-        await client.telegram.sendDocument(
-          chatId,
-          { source: buffer, filename: fileName },
-          Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
-        )
+        await sendFile({ source: buffer, filename: fileName })
       })
   } else {
-    await client.telegram.sendDocument(
-      chatId,
-      event.payload.url,
-      Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
-    )
+    await sendFile(event.payload.url)
+  }
+
+  async function sendFile(bufferOrURL) {
+    try {
+      await client.telegram.sendDocument(
+        chatId,
+        bufferOrURL,
+        Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
+      )
+    } catch (e) {
+      console.log('File sending error: ', e)
+    }
   }
 }
 
