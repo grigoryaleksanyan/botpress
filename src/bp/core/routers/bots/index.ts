@@ -447,7 +447,19 @@ export class BotsRouter extends CustomRouter {
     )
 
     const mediaUploadMulter = fileUploadMulter(
-      ['image/jpeg', 'image/png', 'image/gif'],
+      [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'text/plain',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      ],
       this.botpressConfig?.fileUpload?.maxFileSize ?? '10mb'
     )
 

@@ -12,7 +12,19 @@ import { CustomRouter } from './customRouter'
 import { checkTokenHeader, fileUploadMulter, needPermissions } from './util'
 
 const DEFAULT_MAX_SIZE = '10mb'
-const DEFAULT_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'] // use ['*'] once implemented
+const DEFAULT_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'text/plain',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+] // use ['*'] once implemented
 const ONE_YEAR_SEC = ms('1y') / 1000
 const debug = DEBUG('media')
 
