@@ -14,6 +14,7 @@ interface IUploadWidgetProps {
   onChange(value: string | null): void
   schema: {
     type: string
+    contentType: string
     $subtype: string
     $filter: string
     title: string
@@ -49,9 +50,17 @@ const UploadWidget: FC<IUploadWidgetProps> = props => {
     setError(null)
   }
 
-  const { $subtype: subtype, type } = props.schema
+  const { $subtype: subtype, type, contentType } = props.schema
   if (type !== 'string' || subtype !== 'media') {
     return null
+  }
+
+  let enterUrlChoice = 'module.builtin.types.image.enterUrlChoice'
+  let uploadFileChoice = 'module.builtin.types.image.uploadFileChoice'
+
+  if (contentType === 'document') {
+    enterUrlChoice = 'module.builtin.types.document.enterUrlChoice'
+    uploadFileChoice = 'module.builtin.types.document.uploadFileChoice'
   }
 
   return (
@@ -62,7 +71,12 @@ const UploadWidget: FC<IUploadWidgetProps> = props => {
     >
       <Fragment>
         {((enterUrlManually && value) || !enterUrlManually) && (
-          <FormFields.Upload axios={axios.create({ baseURL: window.BOT_API_PATH })} onChange={onChange} value={value} />
+          <FormFields.Upload
+            axios={axios.create({ baseURL: window.BOT_API_PATH })}
+            onChange={onChange}
+            value={value}
+            contentType={contentType}
+          />
         )}
 
         {enterUrlManually && !value && (
@@ -72,9 +86,7 @@ const UploadWidget: FC<IUploadWidgetProps> = props => {
         {!value && (
           <div className={localStyle.fieldContainer}>
             <a className={localStyle.toggleLink} onClick={handleToggleManually}>
-              {!enterUrlManually
-                ? lang.tr('module.builtin.types.image.enterUrlChoice')
-                : lang.tr('module.builtin.types.image.uploadFileChoice')}
+              {!enterUrlManually ? lang.tr(enterUrlChoice) : lang.tr(uploadFileChoice)}
             </a>
 
             {error && <p className={cn(style.fieldError, localStyle.fieldError)}>{error}</p>}

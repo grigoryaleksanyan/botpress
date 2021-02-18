@@ -77,6 +77,13 @@ const Upload: FC<UploadFieldProps> = props => {
   }
 
   const { value } = props
+  const { contentType } = props
+
+  let accept = '.jpg, .png, .jpeg, .gif'
+
+  if (contentType === 'document') {
+    accept = '.jpg, .png, .jpeg, .gif, .txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx'
+  }
 
   return (
     <div className={sharedStyle.fieldWrapper}>
@@ -104,7 +111,7 @@ const Upload: FC<UploadFieldProps> = props => {
             inputProps={{
               id: 'node-image',
               name: 'nodeImage',
-              accept: 'image/*',
+              accept,
               onChange: startUpload
             }}
           />

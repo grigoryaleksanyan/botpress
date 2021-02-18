@@ -62,6 +62,7 @@ module.exports = {
     properties: {
       document: {
         type: 'string',
+        contentType: 'document',
         $subtype: 'media',
         $filter: '.jpg, .png, .jpeg, .gif, .txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx',
         title: 'module.builtin.types.document.title'

@@ -61,6 +61,7 @@ export type TextProps = FieldProps & { field: FormField }
 
 export interface UploadFieldProps extends FieldProps {
   axios: any
+  contentType?: string
   customPath?: string
   onChange?: (url: string | undefined) => void
 }

@@ -140,6 +140,7 @@ module.exports = {
     properties: {
       image: {
         type: 'string',
+        contentType: 'image',
         $subtype: 'media',
         $filter: '.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*',
         title: 'module.builtin.types.image.title'
