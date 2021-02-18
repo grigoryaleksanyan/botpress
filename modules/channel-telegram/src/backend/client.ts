@@ -1,20 +1,21 @@
 import * as sdk from 'botpress/sdk'
 import _ from 'lodash'
+import fetch from 'node-fetch'
 import path from 'path'
 import Telegraf, { Button, CallbackButton, ContextMessageUpdate, Markup } from 'telegraf'
 import Extra from 'telegraf/extra'
-
+import { URL } from 'url'
 import { Clients } from './typings'
 
-const outgoingTypes = ['text', 'typing', 'image', 'login_prompt', 'carousel']
+const outgoingTypes = ['text', 'typing', 'image', 'document', 'login_prompt', 'carousel']
 
 export const sendEvent = async (bp: typeof sdk, botId: string, ctx: ContextMessageUpdate, args: { type: string }) => {
   // NOTE: getUpdate and setWebhook dot not return the same context mapping
   const threadId = _.get(ctx, 'chat.id') || _.get(ctx, 'message.chat.id')
   const target = _.get(ctx, 'from.id') || _.get(ctx, 'message.from.id')
 
-  const payload = _.get(ctx, 'message') || _.get(ctx, 'callback_query')
-  const preview = _.get(ctx, 'message.text') || _.get(ctx, 'callback_query.data')
+  const payload = _.get(ctx, 'message') !== undefined ? _.get(ctx, 'message') : _.get(ctx, 'callback_query')
+  const preview = _.get(ctx, 'message') !== undefined ? _.get(ctx, 'message.text') : _.get(ctx, 'callback_query.data')
 
   await bp.events.sendEvent(
     bp.IO.Event({
@@ -78,6 +79,8 @@ export async function setupMiddleware(bp: typeof sdk, clients: Clients) {
       await sendTextMessage(event, client, chatId)
     } else if (messageType === 'image') {
       await sendImage(event, client, chatId)
+    } else if (messageType === 'document') {
+      await sendDocument(event, client, chatId)
     } else if (messageType === 'carousel') {
       await sendCarousel(event, client, chatId)
     } else {
@@ -145,6 +148,37 @@ async function sendImage(event: sdk.IO.Event, client: Telegraf<ContextMessageUpd
   }
 }
 
+// Отправка документа
+async function sendDocument(event: sdk.IO.Event, client: Telegraf<ContextMessageUpdate>, chatId: string) {
+  const keyboard = Markup.keyboard(keyboardButtons<Button>(event.payload.quick_replies))
+
+  const isBpUrl = (str: string): boolean => {
+    const re = /^.*\/api\/.*\/bots\/.*\/media\/.*/g
+
+    return re.test(str)
+  }
+
+  if (isBpUrl(event.payload.url)) {
+    const urlParseArr = event.payload.url.split('/')
+
+    fetch(new URL(event.payload.url))
+      .then(response => response.buffer())
+      .then(async buffer => {
+        await send({ source: buffer, filename: urlParseArr[urlParseArr.length - 1] })
+      })
+  } else {
+    await send(event.payload.url)
+  }
+
+  async function send(bufferOrURL) {
+    await client.telegram.sendDocument(
+      chatId,
+      bufferOrURL,
+      Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
+    )
+  }
+}
+
 async function sendTyping(event: sdk.IO.Event, client: Telegraf<ContextMessageUpdate>, chatId: string) {
   const typing = parseTyping(event.payload.value)
   await client.telegram.sendChatAction(chatId, 'typing')
@@ -166,14 +200,37 @@ function keyboardButtons<T>(arr: any[] | undefined): T[] | undefined {
 
   const rows = arr[0].length ? arr : [arr]
 
-  return rows.map(
+  const avg_len = rows[0].reduce((total, next) => total + next.title.length, 0) / rows[0].length
+
+  let b_per_r = 2
+
+  if (avg_len > 20) {
+    b_per_r = 1
+  }
+
+  const rows_splitted = splitKeyboard(rows[0], b_per_r)
+
+  return rows_splitted.map(
     row =>
       row.map(x => {
         if (x.url) {
           return Markup.urlButton(x.title, x.url)
         }
 
+        if (x.title === 'Отправить мой номер телефона') {
+          return Markup.contactRequestButton(x.title)
+        }
+
         return Markup.callbackButton(x.title, x.payload || '')
       }) as any
+  )
+}
+
+function splitKeyboard(array, chunkSize) {
+  return [].concat.apply(
+    [],
+    array.map((elem, i) => {
+      return i % chunkSize ? [] : [array.slice(i, i + chunkSize)]
+    })
   )
 }
