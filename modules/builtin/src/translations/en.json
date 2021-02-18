@@ -27,6 +27,17 @@
       "enterUrlChoice": "Or enter the image URL",
       "uploadImage": "Upload Image"
     },
+    "document": {
+      "description": "A message showing an document with an optional title",
+      "documentLabel": "Title",
+      "labelDesc": "Some platforms require to name the documents.",
+      "permissionDenied": "You don't have permission to upload files for this bot. Talk to your team owner.",
+      "infoInterpreted": "This information will be interpreted:",
+      "title": "Document",
+      "uploadFileChoice": "Or upload an document",
+      "enterUrlChoice": "Or enter the document URL",
+      "uploadDocument": "Upload Document"
+    },
     "singleChoice": {
       "choice": "Choice",
       "description": "Suggest choices to the user with the intention of picking only one (with an optional message)",
