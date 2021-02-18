@@ -133,18 +133,45 @@ async function sendTextMessage(event: sdk.IO.Event, client: Telegraf<ContextMess
 
 async function sendImage(event: sdk.IO.Event, client: Telegraf<ContextMessageUpdate>, chatId: string) {
   const keyboard = Markup.keyboard(keyboardButtons<Button>(event.payload.quick_replies))
-  if (event.payload.url.toLowerCase().endsWith('.gif')) {
-    await client.telegram.sendAnimation(
-      chatId,
-      event.payload.url,
-      Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
-    )
+
+  const isBpUrl = (str: string): boolean => {
+    const re = /^.*\/api\/.*\/bots\/.*\/media\/.*/g
+
+    return re.test(str)
+  }
+
+  if (isBpUrl(event.payload.url)) {
+    fetch(new URL(event.payload.url))
+      .then(response => response.buffer())
+      .then(async buffer => {
+        if (event.payload.url.toLowerCase().endsWith('.gif')) {
+          await client.telegram.sendAnimation(
+            chatId,
+            { source: buffer },
+            Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
+          )
+        } else {
+          await client.telegram.sendPhoto(
+            chatId,
+            { source: buffer },
+            Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
+          )
+        }
+      })
   } else {
-    await client.telegram.sendPhoto(
-      chatId,
-      event.payload.url,
-      Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
-    )
+    if (event.payload.url.toLowerCase().endsWith('.gif')) {
+      await client.telegram.sendAnimation(
+        chatId,
+        event.payload.url,
+        Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
+      )
+    } else {
+      await client.telegram.sendPhoto(
+        chatId,
+        event.payload.url,
+        Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
+      )
+    }
   }
 }
 
