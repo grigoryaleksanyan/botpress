@@ -92,6 +92,12 @@ export async function setupMiddleware(bp: typeof sdk, clients: Clients) {
   }
 }
 
+const isBpUrl = (str: string): boolean => {
+  const re = /^.*\/api\/.*\/bots\/.*\/media\/.*/g
+
+  return re.test(str)
+}
+
 async function sendCarousel(event: sdk.IO.Event, client: Telegraf<ContextMessageUpdate>, chatId: string) {
   if (event.payload.elements && event.payload.elements.length) {
     const { title, picture, subtitle } = event.payload.elements[0]
@@ -134,12 +140,6 @@ async function sendTextMessage(event: sdk.IO.Event, client: Telegraf<ContextMess
 async function sendImage(event: sdk.IO.Event, client: Telegraf<ContextMessageUpdate>, chatId: string) {
   const keyboard = Markup.keyboard(keyboardButtons<Button>(event.payload.quick_replies))
 
-  const isBpUrl = (str: string): boolean => {
-    const re = /^.*\/api\/.*\/bots\/.*\/media\/.*/g
-
-    return re.test(str)
-  }
-
   if (isBpUrl(event.payload.url)) {
     fetch(new URL(event.payload.url))
       .then(response => response.buffer())
@@ -175,32 +175,26 @@ async function sendImage(event: sdk.IO.Event, client: Telegraf<ContextMessageUpd
   }
 }
 
-// Отправка документа
 async function sendDocument(event: sdk.IO.Event, client: Telegraf<ContextMessageUpdate>, chatId: string) {
   const keyboard = Markup.keyboard(keyboardButtons<Button>(event.payload.quick_replies))
 
-  const isBpUrl = (str: string): boolean => {
-    const re = /^.*\/api\/.*\/bots\/.*\/media\/.*/g
-
-    return re.test(str)
-  }
-
   if (isBpUrl(event.payload.url)) {
     const urlParseArr = event.payload.url.split('/')
+    const fileName = urlParseArr[urlParseArr.length - 1]
 
     fetch(new URL(event.payload.url))
       .then(response => response.buffer())
       .then(async buffer => {
-        await send({ source: buffer, filename: urlParseArr[urlParseArr.length - 1] })
+        await client.telegram.sendDocument(
+          chatId,
+          { source: buffer, filename: fileName },
+          Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
+        )
       })
   } else {
-    await send(event.payload.url)
-  }
-
-  async function send(bufferOrURL) {
     await client.telegram.sendDocument(
       chatId,
-      bufferOrURL,
+      event.payload.url,
       Extra.markdown(false).markup({ ...keyboard, one_time_keyboard: true })
     )
   }
