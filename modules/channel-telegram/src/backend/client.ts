@@ -14,8 +14,11 @@ export const sendEvent = async (bp: typeof sdk, botId: string, ctx: ContextMessa
   const threadId = _.get(ctx, 'chat.id') || _.get(ctx, 'message.chat.id')
   const target = _.get(ctx, 'from.id') || _.get(ctx, 'message.from.id')
 
-  const payload = _.get(ctx, 'message') !== undefined ? _.get(ctx, 'message') : _.get(ctx, 'callback_query')
-  const preview = _.get(ctx, 'message') !== undefined ? _.get(ctx, 'message.text') : _.get(ctx, 'callback_query.data')
+  // const payload = _.get(ctx, 'message') !== undefined ? _.get(ctx, 'message') : _.get(ctx, 'callback_query')
+  // const preview = _.get(ctx, 'message') !== undefined ? _.get(ctx, 'message.text') : _.get(ctx, 'callback_query.data')
+
+  const payload = ctx.message !== undefined ? ctx.message : ctx.callbackQuery
+  const preview = ctx.message !== undefined ? ctx.message.text : ctx.callbackQuery.data
 
   await bp.events.sendEvent(
     bp.IO.Event({
