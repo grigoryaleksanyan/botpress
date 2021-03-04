@@ -183,7 +183,9 @@ async function sendDocument(event: sdk.IO.Event, client: Telegraf<ContextMessage
 
   if (isBpUrl(event.payload.url)) {
     const urlParseArr = event.payload.url.split('/')
-    const fileName = urlParseArr[urlParseArr.length - 1]
+    const fileNameFull = urlParseArr[urlParseArr.length - 1]
+    const fileNameArr = fileNameFull.split('-')
+    const fileName = fileNameArr[1]
 
     fetch(new URL(event.payload.url))
       .then(response => response.buffer())
