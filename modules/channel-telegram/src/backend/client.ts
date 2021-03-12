@@ -185,7 +185,7 @@ async function sendDocument(event: sdk.IO.Event, client: Telegraf<ContextMessage
     const urlParseArr = event.payload.url.split('/')
     const fileNameFull = urlParseArr[urlParseArr.length - 1]
     const fileNameArr = fileNameFull.split('-')
-    const fileName = fileNameArr[1]
+    const fileName = fileNameArr[fileNameArr.length - 1]
 
     fetch(new URL(event.payload.url))
       .then(response => response.buffer())

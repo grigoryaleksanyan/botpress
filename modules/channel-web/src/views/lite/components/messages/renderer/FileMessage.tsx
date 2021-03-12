@@ -1,4 +1,4 @@
-import mimeTypes from 'mime/lite'
+import mimeTypes from 'mime'
 import path from 'path'
 import React from 'react'
 
@@ -55,6 +55,19 @@ export const FileMessage = (props: Renderer.FileMessage) => {
       <video width={240} controls>
         <source src={url} type={mime} />
       </video>
+    )
+  } else {
+    const urlParseArr = url.split('/')
+    const fileNameFull = urlParseArr[urlParseArr.length - 1]
+    const fileNameArr = fileNameFull.split('-')
+    const fileName = fileNameArr[fileNameArr.length - 1]
+    return (
+      <p>
+        Скачать документ:{' '}
+        <a href={url} target={'_blank'}>
+          {fileName}
+        </a>
+      </p>
     )
   }
 }
