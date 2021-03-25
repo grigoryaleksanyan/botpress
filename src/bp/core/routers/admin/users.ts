@@ -9,7 +9,7 @@ import _ from 'lodash'
 import { CustomRouter } from '../customRouter'
 import { ConflictError } from '../errors'
 import {
-  assertBotpressPro,
+  // assertBotpressPro,
   assertSuperAdmin,
   needPermissions,
   success as sendSuccess,
@@ -19,12 +19,12 @@ import {
 export class UsersRouter extends CustomRouter {
   private readonly resource = 'admin.collaborators'
   private needPermissions: (operation: string, resource: string) => RequestHandler
-  private assertBotpressPro: RequestHandler
+  // private assertBotpressPro: RequestHandler
 
   constructor(logger: Logger, private authService: AuthService, private workspaceService: WorkspaceService) {
     super('Users', logger, Router({ mergeParams: true }))
     this.needPermissions = needPermissions(this.workspaceService)
-    this.assertBotpressPro = assertBotpressPro(this.workspaceService)
+    // this.assertBotpressPro = assertBotpressPro(this.workspaceService)
     this.setupRoutes()
   }
 
@@ -68,7 +68,7 @@ export class UsersRouter extends CustomRouter {
 
     router.post(
       '/workspace/add',
-      this.assertBotpressPro,
+      // this.assertBotpressPro,
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
         const { strategy, role } = req.body
@@ -118,7 +118,7 @@ export class UsersRouter extends CustomRouter {
 
     router.post(
       '/',
-      this.assertBotpressPro,
+      // this.assertBotpressPro,
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
         validateBodySchema(

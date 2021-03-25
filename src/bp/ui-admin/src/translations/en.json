@@ -207,7 +207,8 @@
       "roles": "Roles",
       "serverLicense": "Server License",
       "sourceControl": "Source Control",
-      "workspace": "Workspace"
+      "workspace": "Workspace",
+      "workspaces": "Workspaces"
     },
     "signIn": "Sign In",
     "signInWithLabel": "Sign in with {label}",

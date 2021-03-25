@@ -12,7 +12,7 @@ import yn from 'yn'
 import { CustomRouter } from '../customRouter'
 import { ConflictError, ForbiddenError } from '../errors'
 import {
-  assertBotpressPro,
+  // assertBotpressPro,
   assertSuperAdmin,
   assertWorkspace,
   hasPermissions,
@@ -37,7 +37,7 @@ export class BotsRouter extends CustomRouter {
   private readonly resource = 'admin.bots'
   private needPermissions: (operation: string, resource: string) => RequestHandler
   private hasPermissions: (req: RequestWithUser, operation: string, resource: string) => Promise<boolean>
-  private assertBotpressPro: RequestHandler
+  // private assertBotpressPro: RequestHandler
   private logger!: Logger
 
   constructor(
@@ -50,7 +50,7 @@ export class BotsRouter extends CustomRouter {
     this.logger = logger
     this.needPermissions = needPermissions(this.workspaceService)
     this.hasPermissions = hasPermissions(this.workspaceService)
-    this.assertBotpressPro = assertBotpressPro(this.workspaceService)
+    // this.assertBotpressPro = assertBotpressPro(this.workspaceService)
     this.router = Router({ mergeParams: true })
     this.setupRoutes()
   }
@@ -154,7 +154,7 @@ export class BotsRouter extends CustomRouter {
 
     router.post(
       '/:botId/stage',
-      this.assertBotpressPro,
+      // this.assertBotpressPro,
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
         try {
@@ -169,7 +169,7 @@ export class BotsRouter extends CustomRouter {
 
     router.post(
       '/:botId/approve-stage',
-      this.assertBotpressPro,
+      // this.assertBotpressPro,
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
         try {

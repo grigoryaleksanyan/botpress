@@ -97,7 +97,8 @@ const Menu: FC<MenuProps> = props => {
           url="/workspace/:workspaceId?/users"
           resource="admin.collaborators.*"
           operation="read"
-          isPro={true}
+          superAdmin={true}
+          // isPro={true}
         />
 
         <MenuItem
@@ -107,7 +108,8 @@ const Menu: FC<MenuProps> = props => {
           url="/workspace/:workspaceId?/roles"
           resource="admin.roles.*"
           operation="read"
-          isPro={true}
+          superAdmin={true}
+          // isPro={true}
         />
 
         <MenuItem
@@ -124,6 +126,12 @@ const Menu: FC<MenuProps> = props => {
         <Fragment>
           <div className="bp-sa-menu-header">{lang.tr('admin.sideMenu.management')}</div>
           <ControlGroup vertical={true} fill={true}>
+            <MenuItem
+              id="btn-menu-workspaces"
+              text={lang.tr('admin.sideMenu.workspaces')}
+              icon="applications"
+              url="/workspaces"
+            />
             <MenuItem
               id="btn-menu-version"
               text={lang.tr('admin.sideMenu.sourceControl')}
