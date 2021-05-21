@@ -26,6 +26,15 @@ export interface QnaItem {
   data: QnaEntry
 }
 
+export interface QnaCategory {
+  id: number
+  name: string
+  contexts: string[]
+  languages: []
+  enabled: boolean
+  data: QnaItem[]
+}
+
 export interface ScopedBots {
   [botId: string]: BotParams
 }

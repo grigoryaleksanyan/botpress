@@ -77,6 +77,43 @@ export class NLURouter extends CustomRouter {
       })
     )
 
+    this.router.get(
+      '/categories',
+      this._checkTokenHeader,
+      this._needPermissions('read', 'bot.content'),
+      this.asyncMiddleware(async (req, res) => {
+        const { botId } = req.params
+        const categoryDefs = await this.nluService.category.getСategories(botId)
+        res.send(categoryDefs)
+      })
+    )
+
+    this.router.post(
+      '/category',
+      this._checkTokenHeader,
+      this._needPermissions('write', 'bot.content'),
+      this.asyncMiddleware(async (req, res) => {
+        console.log('Пришло в NLU: ', req.body, req.params)
+
+        const { botId } = req.params
+        try {
+          // const intentDef = await validate(req.body, IntentDefCreateSchema, {
+          //   stripUnknown: true
+          // })
+
+          await this.nluService.category.saveCategory(botId, req.body)
+
+          res.sendStatus(200)
+        } catch (err) {
+          this.logger
+            .forBot(botId)
+            .attachError(err)
+            .warn('Cannot create category')
+          res.status(400).send(err.message)
+        }
+      })
+    )
+
     this.router.post(
       '/intents',
       this._checkTokenHeader,

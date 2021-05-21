@@ -601,6 +601,14 @@ declare module 'botpress/sdk' {
       matches?: (intentPattern: string) => boolean
     }
 
+    export interface Category {
+      //id: number
+      name: string
+      context: string
+      languages: []
+      enabled: boolean
+    }
+
     export interface Entity {
       name: string
       type: string

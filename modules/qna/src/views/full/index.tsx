@@ -5,6 +5,7 @@ import cx from 'classnames'
 import { debounce } from 'lodash'
 import React, { FC, useCallback, useEffect, useReducer, useRef, useState } from 'react'
 
+import AddCategoryModal from './Components/AddCategoryModal'
 import ContextSelector from './Components/ContextSelector'
 import { ImportModal } from './Components/ImportModal'
 import QnA from './Components/QnA'
@@ -17,6 +18,7 @@ const QnAList: FC<Props> = props => {
   const [filterContexts, setFilterContexts] = useState([])
   const [questionSearch, setQuestionSearch] = useState('')
   const [showImportModal, setShowImportModal] = useState(false)
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
   const [currentTab, setCurrentTab] = useState('qna')
   const [currentLang, setCurrentLang] = useState(props.contentLang)
   const [url, setUrl] = useState('')
@@ -25,6 +27,7 @@ const QnAList: FC<Props> = props => {
   const [state, dispatch] = useReducer(fetchReducer, {
     count: 0,
     items: [],
+    category: [],
     highlighted: undefined,
     loading: true,
     firstUpdate: true,
@@ -184,13 +187,26 @@ const QnAList: FC<Props> = props => {
     )
   }
 
-  buttons.push({
-    icon: 'plus',
-    onClick: () => {
-      dispatch({ type: 'addQnA', data: { languages, contexts: [props.topicName || 'global'] } })
+  buttons.push(
+    {
+      icon: 'plus',
+      onClick: () => {
+        dispatch({ type: 'addQnA', data: { languages, contexts: [props.topicName || 'global'] } })
+      },
+      tooltip: lang.tr('module.qna.form.addQuestion')
     },
-    tooltip: lang.tr('module.qna.form.addQuestion')
-  })
+    {
+      icon: 'plus',
+      onClick: () => setShowAddCategoryModal(true),
+      // onClick: () => {
+      //   dispatch({
+      //     type: 'addCategory',
+      //     data: { name: 'HelpMe', languages, contexts: [props.topicName || 'global'], bp }
+      //   })
+      // },
+      tooltip: 'Add category'
+    }
+  )
 
   const fetchData = async (page = 1) => {
     dispatch({ type: 'loading' })
@@ -216,7 +232,6 @@ const QnAList: FC<Props> = props => {
   return (
     <MainLayout.Wrapper childRef={ref => (wrapperRef.current = ref)}>
       <MainLayout.Toolbar className={style.header} tabChange={setCurrentTab} tabs={tabs} buttons={buttons} />
-
       <div className={style.searchWrapper}>
         <input
           className={style.input}
@@ -327,6 +342,12 @@ const QnAList: FC<Props> = props => {
         onImportCompleted={() => fetchData()}
         isOpen={showImportModal}
         toggle={() => setShowImportModal(!showImportModal)}
+      />
+      <AddCategoryModal
+        axios={bp.axios}
+        isOpen={showAddCategoryModal}
+        languages={languages}
+        toggle={() => setShowAddCategoryModal(!showAddCategoryModal)}
       />
     </MainLayout.Wrapper>
   )

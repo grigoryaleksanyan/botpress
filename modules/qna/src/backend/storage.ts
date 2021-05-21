@@ -1,10 +1,11 @@
 import axios from 'axios'
 import * as sdk from 'botpress/sdk'
+import { response } from 'express'
 
 import _ from 'lodash'
 import nanoid from 'nanoid/generate'
 
-import { QnaEntry, QnaItem } from './qna'
+import { QnaCategory, QnaEntry, QnaItem } from './qna'
 
 export const NLU_PREFIX = '__qna__'
 
@@ -152,6 +153,29 @@ export default class Storage {
     const id = makeID(data)
     await this.upsertItem({ id, data })
     return id
+  }
+
+  async insertCategory(data: QnaCategory): Promise<string> {
+    console.log(data)
+
+    const axiosConfig = await this.getAxiosConfig()
+
+    // const id = Date.now()
+    // data.id = id
+
+    await axios
+      .post('/nlu/category', data, axiosConfig)
+      .then(async response => {
+        await axios.get('/nlu/categories', axiosConfig).then(response => {
+          console.log('Получаю категории', response.data)
+        })
+        return response.status
+      })
+      .catch(() => {
+        console.log(response.statusMessage)
+      })
+
+    return 'OK'
   }
 
   private async checkForDuplicatedQuestions(newItem: QnaEntry, editingQnaId?: string) {

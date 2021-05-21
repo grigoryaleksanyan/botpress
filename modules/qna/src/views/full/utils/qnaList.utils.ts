@@ -2,14 +2,16 @@ import { lang } from 'botpress/shared'
 import _ from 'lodash'
 import _uniqueId from 'lodash/uniqueId'
 
-import { QnaItem } from '../../../backend/qna'
+import { QnaItem, QnaCategory } from '../../../backend/qna'
 
 export const ITEMS_PER_PAGE = 50
 export const NEW_QNA_PREFIX = 'qna-'
+export const NEW_QNA_CATEGORY_PREFIX = 'qna_category-'
 
 export interface State {
   count: number
   items: QnaItem[]
+  category: QnaCategory[]
   highlighted?: QnaItem
   loading: boolean
   firstUpdate: boolean
@@ -61,6 +63,7 @@ export const itemHasError = (qnaItem: QnaItem, currentLang: string): string[] =>
 }
 
 export const dispatchMiddleware = async (dispatch, action) => {
+  console.log(action.type)
   const { qnaItem, bp } = action.data
   switch (action.type) {
     case 'updateQnA':
@@ -128,6 +131,12 @@ export const dispatchMiddleware = async (dispatch, action) => {
         }
       }
 
+      dispatch(action)
+      break
+
+    case 'addCategory':
+      console.log('Выполнение запроса')
+      await bp.axios.post('/mod/qna/category', action.data)
       dispatch(action)
       break
 
@@ -277,6 +286,34 @@ export const fetchReducer = (state: State, action): State => {
     return {
       ...state,
       items: state.items
+    }
+  } else if (action.type === 'addCategory') {
+    const { bp } = action.data
+    const newCategory = state.category
+    const id = 1
+    const { name, languages, contexts } = action.data
+
+    const category = {
+      id,
+      name,
+      contexts,
+      languages,
+      enabled: true,
+      data: []
+    }
+
+    newCategory.unshift(category)
+
+    console.log('Все категории: ', state.category)
+
+    console.log(action.data)
+
+    console.log('Выполнение запроса')
+    bp.axios.post('/mod/qna/category', category)
+
+    return {
+      ...state,
+      category: newCategory
     }
   } else {
     throw new Error("That action type isn't supported.")

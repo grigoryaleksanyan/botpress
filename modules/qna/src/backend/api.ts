@@ -42,6 +42,22 @@ export default async (bp: typeof sdk, bots: ScopedBots) => {
     }
   })
 
+  router.post('/category', async (req: Request, res: Response, next: Function) => {
+    try {
+      console.log('Запрос пришел в API: ', req.body)
+
+      const { storage } = bots[req.params.botId]
+      const id = await storage.insertCategory(req.body)
+      res.send([id])
+      // const qnaEntry = (await validate(req.body, QnaDefSchema)) as QnaEntry
+      // const { storage } = bots[req.params.botId]
+      // const id = await storage.insert(qnaEntry)
+      // res.send([id])
+    } catch (e) {
+      next(new Error(e.message))
+    }
+  })
+
   router.get('/questions/:id', async (req: Request, res: Response) => {
     try {
       const { storage } = bots[req.params.botId]
